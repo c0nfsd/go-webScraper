@@ -5,13 +5,21 @@ import (
 	"fmt"
 	"go-webScraper/helper"
 	"net/http"
+	"os"
 
 	"github.com/steelx/extractlinks"
 )
 
 func main() {
 
-	baseUrl := "https://youtube.com/jsfunc"
+	arguments := os.Args[1:]
+
+	if len(arguments) == 0 {
+		fmt.Println("Url cannot be empty, please enter a valid URL, example: https://wikileaks.org")
+		os.Exit(1)
+	}
+	baseUrl := arguments[0]
+	fmt.Println("baseUrl", baseUrl)
 
 	config := &tls.Config{
 		InsecureSkipVerify: true,
@@ -31,8 +39,8 @@ func main() {
 	links, err := extractlinks.All(res.Body)
 	helper.ErrCheck(err)
 
-	fmt.Println(links)
-
-	//res.Body.Close()
+	for i, link := range links {
+		fmt.Printf("Index %v --Link %+v\n", i+1, link)
+	}
 
 }
