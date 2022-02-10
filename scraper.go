@@ -4,8 +4,9 @@ import (
 	"crypto/tls"
 	"fmt"
 	"go-webScraper/helper"
-	"io/ioutil"
 	"net/http"
+
+	"github.com/steelx/extractlinks"
 )
 
 func main() {
@@ -25,10 +26,11 @@ func main() {
 
 	res, err := netClient.Get(baseUrl)
 	helper.ErrCheck(err)
+	defer res.Body.Close()
 
-	body, _ := ioutil.ReadAll(res.Body)
+	links, err := extractlinks.All(res.Body)
+	fmt.Println(links)
 
-	fmt.Println(string(body))
-	res.Body.Close()
+	//res.Body.Close()
 
 }
