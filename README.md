@@ -1,1 +1,1 @@
-#A web scraper written in Go
+# A web scraper written in Go
