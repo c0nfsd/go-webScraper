@@ -29,6 +29,8 @@ func main() {
 	defer res.Body.Close()
 
 	links, err := extractlinks.All(res.Body)
+	helper.ErrCheck(err)
+
 	fmt.Println(links)
 
 	//res.Body.Close()
