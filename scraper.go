@@ -14,8 +14,14 @@ func main() {
 		fmt.Println("Url cannot be empty, please enter a valid URL, example: https://wikileaks.org")
 		os.Exit(1)
 	}
-	baseUrl := arguments[0]
 
-	helper.Urlcrawl(baseUrl)
+	func() {
+		helper.Queue <- arguments[0]
+	}()
+
+	for href := range helper.Queue {
+		helper.Urlcrawl(href)
+
+	}
 
 }

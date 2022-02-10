@@ -21,6 +21,7 @@ var (
 	netClient = &http.Client{
 		Transport: transport,
 	}
+	Queue = make(chan string)
 )
 
 func ErrCheck(err error) {
@@ -40,7 +41,11 @@ func Urlcrawl(href string) {
 	ErrCheck(err)
 
 	for _, link := range links {
-		Urlcrawl(ToFixedURL(link.Href, href))
+		absoluteURL := ToFixedURL(link.Href, href)
+		go func() {
+			Queue <- absoluteURL
+		}()
+
 	}
 }
 
