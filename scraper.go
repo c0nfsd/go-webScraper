@@ -15,12 +15,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	func() {
-		helper.Queue <- arguments[0]
+	baseURL := arguments[0]
+	go func() {
+		helper.Queue <- baseURL
 	}()
 
 	for href := range helper.Queue {
-		helper.Urlcrawl(href)
+		if !helper.Visited[href] && helper.IsSameDomain(href, baseURL) {
+			helper.Urlcrawl(href)
+		}
 
 	}
 

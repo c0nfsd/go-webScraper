@@ -21,32 +21,51 @@ var (
 	netClient = &http.Client{
 		Transport: transport,
 	}
-	Queue = make(chan string)
+	Queue   = make(chan string)
+	Visited = make(map[string]bool)
 )
 
-func ErrCheck(err error) {
+func errCheck(err error) {
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
+		os.Exit(0)
 	}
 }
 
 func Urlcrawl(href string) {
+	Visited[href] = true
 	fmt.Printf("Crawling url -----> %v \n", href)
-	res, err := netClient.Get(href)
-	ErrCheck(err)
-	defer res.Body.Close()
+	resp, err := netClient.Get(href)
+	errCheck(err)
+	defer resp.Body.Close()
 
-	links, err := extractlinks.All(res.Body)
-	ErrCheck(err)
+	links, err := extractlinks.All(resp.Body)
+	errCheck(err)
 
 	for _, link := range links {
 		absoluteURL := ToFixedURL(link.Href, href)
-		go func() {
-			Queue <- absoluteURL
-		}()
+		go func(url string) {
+			Queue <- url
+		}(absoluteURL)
 
 	}
+}
+
+func IsSameDomain(href, baseURL string) bool {
+	uri, err := url.Parse(href)
+	if err != nil {
+		return false
+	}
+
+	parentUri, err := url.Parse(baseURL)
+	if err != nil {
+		return false
+	}
+
+	if uri.Host != parentUri.Host {
+		return false
+	}
+	return true
 }
 
 func ToFixedURL(href, baseURL string) string {
